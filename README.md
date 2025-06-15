@@ -1,4 +1,9 @@
 ## Form Fields
+[![crates.io](https://img.shields.io/crates/v/form_fields.svg)](https://crates.io/crates/form_fields)
+![Crates.io Size](https://img.shields.io/crates/size/form_fields)
+![Crates.io Downloads (recent)](https://img.shields.io/crates/dr/form_fields)
+[![docs.rs](https://docs.rs/form_fields/badge.svg)](https://docs.rs/form_fields)
+[![License: GNU JPL](https://img.shields.io/badge/License-GNU%20JPL-blue.svg)](http://tom7.org/bovex/JCOPYING)
 
 Helper crate for working with HTML forms in [axum](https://github.com/tokio-rs/axum/).
 

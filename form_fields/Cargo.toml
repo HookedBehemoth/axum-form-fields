@@ -16,7 +16,7 @@ chrono = ["dep:chrono"]
 derive = ["dep:form_fields_macro"]
 
 [dependencies]
-form_fields_macro = { workspace = true, optional = true }
+form_fields_macro = { version = "0", path = "../form_fields_macro", optional = true }
 
 chrono = { workspace = true, optional = true }
 maud.workspace = true

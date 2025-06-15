@@ -1,8 +1,6 @@
-use axum::{
-    body::{Body, to_bytes},
-    extract::Request,
-};
-use multer::Multipart;
+/// Either urlencoded or multipart has to be enabled
+#[cfg(not(any(feature = "urlencoded", feature = "multipart")))]
+compile_error!("Either the 'urlencoded' or 'multipart' feature must be enabled.");
 
 pub trait FormSpecable {
     type Spec: FormSpec;
@@ -57,71 +55,17 @@ async fn parse_request_body<Form: FormSpec>(
 
     log::debug!("content_type: {}", content_type);
     match &content_type {
+        #[cfg(feature = "urlencoded")]
         content_type if content_type == "application/x-www-form-urlencoded" => {
-            parse_form_urlencoded(form, req).await
+            crate::urlencoded::parse_form_urlencoded(form, req).await
         }
+        #[cfg(feature = "multipart")]
         content_type if content_type.starts_with("multipart/form-data") => {
-            // Handle multipart form data if necessary
-            parse_multipart(form, req, content_type).await
+            crate::multipart::parse_multipart(form, req, content_type).await
         }
         _ => {
             // Handle other content types if necessary
             None
         }
     }
-}
-
-async fn parse_form_urlencoded<Form: FormSpec>(form: &mut Form, req: Request<Body>) -> Option<()> {
-    let Ok(bytes) = to_bytes(req.into_body(), u16::MAX as _).await else {
-        return None;
-    };
-
-    let text = String::from_utf8(bytes.to_vec()).ok()?;
-    log::debug!("Parsing form-urlencoded data: {}", text);
-
-    let parsed = form_urlencoded::parse(&bytes);
-
-    for (key, value) in parsed {
-        log::debug!("Parsing field: {} = {}", key, value);
-        if !form.parse_field(&key, &value) {
-            return None;
-        }
-    }
-
-    Some(())
-}
-
-async fn parse_multipart<Form: FormSpec>(
-    form: &mut Form,
-    req: Request<Body>,
-    content_type: &str,
-) -> Option<()> {
-    let boundary = multer::parse_boundary(content_type).ok()?;
-    let body = req.into_body();
-
-    // Create a Multipart parser
-    let mut multipart = Multipart::new(body.into_data_stream(), boundary);
-
-    while let Some(field) = multipart.next_field().await.ok()? {
-        let Some(name) = field.name() else {
-            continue;
-        };
-        let name = name.to_string();
-        log::debug!("Parsing field: {}", name);
-
-        if let Some(file_name) = field.file_name() {
-            log::warn!("File not supported: {}", file_name);
-            continue;
-        }
-
-        if let Ok(text) = field.text().await {
-            log::debug!("Field text: {}", text);
-            if !form.parse_field(&name, &text) {
-                log::error!("Failed to parse: {}", name);
-                return None;
-            }
-        }
-    }
-
-    Some(())
 }

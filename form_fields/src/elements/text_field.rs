@@ -1,5 +1,6 @@
 use crate::{Descriptor, FormField};
 
+/// Represents a text input field [`<input type="text">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/text).
 #[derive(Debug)]
 pub struct TextField {
     pub value: Option<String>,

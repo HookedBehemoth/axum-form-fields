@@ -2,6 +2,7 @@ use std::{fmt::Debug, str::FromStr};
 
 use crate::{Descriptor, FormField, selectable::Selectable};
 
+/// Represents a select input [`<select>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select).
 #[derive(Debug)]
 pub struct Select<T: Selectable + Debug> {
     pub key: Option<T::Key>,

@@ -2,6 +2,7 @@ use std::{fmt::Debug, str::FromStr};
 
 use crate::{Descriptor, FormField, selectable::Selectable};
 
+/// Represents a multi-select input [`<input type="checkbox">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/checkbox).
 #[derive(Debug)]
 pub struct MultiSelect<T: Selectable + Debug> {
     pub keys: Vec<T::Key>,

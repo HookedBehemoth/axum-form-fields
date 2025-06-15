@@ -4,6 +4,7 @@ use chrono::NaiveDate;
 
 use crate::{Descriptor, FormField, validation_value::Value};
 
+/// Represents a date picker input [`<input type="date">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/date).
 #[derive(Debug)]
 pub struct DatePicker {
     pub value: Value<NaiveDate>,

@@ -2,6 +2,7 @@ use std::{fmt::Debug, str::FromStr};
 
 use crate::{Descriptor, FormField, selectable::Selectable};
 
+/// Represents a radio button input [`<input type="radio">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/radio).
 #[derive(Debug)]
 pub struct RadioButton<T: Selectable + Debug> {
     pub key: Option<T::Key>,

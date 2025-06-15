@@ -1,4 +1,5 @@
 pub mod checkbox;
+#[cfg(feature = "chrono")]
 pub mod date_picker;
 pub mod multiselect;
 pub mod number_field;
@@ -8,6 +9,7 @@ pub mod text_field;
 
 pub type TextField = text_field::TextField;
 pub type NumberField<T> = number_field::NumberField<T>;
+#[cfg(feature = "chrono")]
 pub type DatePicker = date_picker::DatePicker;
 pub type Checkbox = checkbox::Checkbox;
 pub type RadioButton<T> = radio_button::RadioButton<T>;

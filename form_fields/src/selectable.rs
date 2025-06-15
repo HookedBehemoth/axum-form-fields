@@ -1,3 +1,6 @@
+/// A trait for types that can be selected in a form field.
+/// This trait is used for radio buttons, select and multiselect fields.
+/// Splits display value and key.
 pub trait Selectable: Clone {
     type Key: PartialEq + ToString + std::str::FromStr;
     type DisplayValue: maud::Render;
@@ -31,8 +34,8 @@ declare_selectable!(i8);
 declare_selectable!(i16);
 declare_selectable!(i32);
 declare_selectable!(i64);
+declare_selectable!(isize);
 declare_selectable!(f32);
 declare_selectable!(f64);
-declare_selectable!(isize);
 declare_selectable!(String);
 declare_selectable!(char);

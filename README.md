@@ -45,14 +45,14 @@ Currently, only [maud](https://maud.lambda.xyz/) is supported, but all data is e
 
 ## Goals for stable release
 
-- [ ] documentation
+- [x] documentation
 - [ ] better naming (help needed)
     - [ ] descriptor
 - [ ] feature segregation
-    - [ ] multer & form_urlencoded
+    - [x] multer & form_urlencoded
     - [ ] axum
     - [ ] renderers
-    - [ ] chrono
+    - [x] chrono
 - [ ] file handling
     - [ ] loaded fully
     - [ ] async user handled

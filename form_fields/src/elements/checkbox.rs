@@ -1,5 +1,6 @@
 use crate::{Descriptor, FormField};
 
+/// Represents a checkbox input [`<input type="checkbox">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/checkbox).
 #[derive(Debug)]
 pub struct Checkbox {
     pub value: Option<bool>,

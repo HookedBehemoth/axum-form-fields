@@ -22,12 +22,13 @@ pub(crate) mod to_quote;
 /// 
 /// ### Supported Attributes
 /// The macro supports the following attributes, which correspond to specific HTML input types:
+/// (If not stated otherwise, all field types can be used with `Option<T>` types)
 /// 
 /// #### `#[text_field]`
 /// - **Description**: Represents a text input field.
 /// - **HTML Input Type**: [`<input type="text">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/text)
+/// - **Supported Types**: `String`
 /// - **Parameters**:
-///   - `display_name`: A string to display as the label for the field.
 ///   - `max_length`: Maximum number of characters allowed in the input.
 ///   - `min_length`: Minimum number of characters required in the input.
 ///   - `placeholder`: Placeholder text displayed inside the input field.
@@ -35,51 +36,56 @@ pub(crate) mod to_quote;
 /// #### `#[number_field]`
 /// - **Description**: Represents a number input field.
 /// - **HTML Input Type**: [`<input type="number">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/number)
+/// - **Supported Types**: `u8`, `i32`, `f64`, etc.
 /// - **Parameters**:
-///   - `display_name`: A string to display as the label for the field.
 ///   - `min`: Minimum value allowed for the input.
 ///   - `max`: Maximum value allowed for the input.
 /// 
 /// #### `#[date_select]`
 /// - **Description**: Represents a date picker input field.
 /// - **HTML Input Type**: [`<input type="date">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/date)
+/// - **Supported Types**: `chrono::NaiveDate`
 /// - **Parameters**:
-///   - `display_name`: A string to display as the label for the field.
 ///   - `min`: Minimum date allowed (formatted as `YYYY-MM-DD`).
 ///   - `max`: Maximum date allowed (formatted as `YYYY-MM-DD`).
 /// 
 /// #### `#[checkbox]`
 /// - **Description**: Represents a checkbox input field.
 /// - **HTML Input Type**: [`<input type="checkbox">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/checkbox)
+/// - **Supported Types**: `bool`
 /// - **Parameters**:
-///   - `display_name`: A string to display as the label for the field.
 ///   - `checked`: Whether the checkbox is pre-checked.
 ///   - `required_true`: Whether the checkbox must be checked to pass validation.
-///   - `help_text`: Additional text to display as help for the field.
 /// 
 /// #### `#[radio_button]`
 /// - **Description**: Represents a radio button input field.
 /// - **HTML Input Type**: [`<input type="radio">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/radio)
+/// - **Supported Types**: Any type that implements the `Selectable` trait. Pre-implemented for primitives and `String`.
 /// - **Parameters**:
-///   - `display_name`: A string to display as the label for the field.
 ///   - `options`: A list of selectable options.
 ///   - `default_value`: The default selected option.
 /// 
 /// #### `#[select]`
 /// - **Description**: Represents a dropdown select input field.
 /// - **HTML Input Type**: [`<select>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select)
+/// - **Supported Types**: T: `Selectable`
 /// - **Parameters**:
-///   - `display_name`: A string to display as the label for the field.
 ///   - `options`: A list of selectable options.
 ///   - `default_value`: The default selected option.
 ///   - `placeholder`: Placeholder text displayed when no option is selected.
 /// 
 /// #### `#[multiselect]`
-/// - **Description**: Represents a multi-select input field.
-/// - **HTML Input Type**: [`<select multiple>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select#attr-multiple)
+/// - **Description**: Represents a list of checkbox input field.
+/// - **HTML Input Type**: [`<input type="checkbox">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/checkbox)
+/// - **Supported Types**: T: `Selectable`
 /// - **Parameters**:
-///   - `display_name`: A string to display as the label for the field.
 ///   - `options`: A list of selectable options.
+/// 
+/// ### Base Field Attributes
+/// The following attributes can be used with any of the above field types:
+/// - `display_name`: A string to display as the label for the field.
+/// - `field_name`: A string to use as the name of the field in the form data. Defaults to the field's identifier.
+/// - `help_text`: Additional text to display as help for the field.
 /// 
 /// ### Example Usage
 /// ```rust
@@ -120,6 +126,7 @@ pub fn from_form(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     }
 }
 
+/// Derive macro for generating selectable types from a copyable struct.
 #[proc_macro_derive(Selectable)]
 pub fn selectable_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = parse_macro_input!(input as syn::DeriveInput);

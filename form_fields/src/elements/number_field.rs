@@ -2,6 +2,7 @@ use std::{fmt::Display, str::FromStr};
 
 use crate::{Descriptor, FormField, validation_value::Value};
 
+/// Represents a number input field [`<input type="number">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/number).
 #[derive(Debug)]
 pub struct NumberField<T: PartialOrd> {
     pub value: Value<T>,

@@ -50,3 +50,4 @@ Currently, only [maud](https://maud.lambda.xyz/) is supported, but all data is e
     - [ ] async user handled
 - [ ] HTML renderers
     - [x] maud
+- [ ] clean up macro code

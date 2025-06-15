@@ -5,6 +5,11 @@ members = ["form_fields", "form_fields_macro"]
 [workspace.package]
 version = "0.1.0"
 edition = "2024"
+license-file = "LICENSE"
+keywords = ["web", "html", "form", "axum", "maud"]
+description = "Helper crate for working with HTML forms."
+repository = "https://github.com/HookedBehemoth/axum-form-fields"
+readme = "README.md"
 
 [workspace.dependencies]
 tokio = { version = "1.44.2", features = ["macros", "rt-multi-thread"] }

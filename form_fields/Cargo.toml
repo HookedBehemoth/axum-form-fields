@@ -1,0 +1,17 @@
+[package]
+name = "form_fields"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+chrono.workspace = true
+maud.workspace = true
+axum.workspace = true
+multer.workspace = true
+form_urlencoded.workspace = true
+log.workspace = true
+
+[dev-dependencies]
+serde.workspace = true
+tokio.workspace = true
+form_fields_macro = { path = "../form_fields_macro" }

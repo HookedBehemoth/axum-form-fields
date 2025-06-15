@@ -9,6 +9,9 @@ Helper crate for working with HTML forms in [axum](https://github.com/tokio-rs/a
 
 Simplifies the parsing and validating user input for creating new and editing existing data in your application.
 
+## Documentation
+Learn about all the possible macro attributes [here](https://docs.rs/form_fields_macro/latest/form_fields_macro/derive.FromForm.html).
+
 ## Examples
 In [The Examples folder](form_fields/examples) folder, you can find a few basic examples.
 
@@ -56,3 +59,4 @@ Currently, only [maud](https://maud.lambda.xyz/) is supported, but all data is e
 - [ ] HTML renderers
     - [x] maud
 - [ ] clean up macro code
+    - [ ] clearer error handling

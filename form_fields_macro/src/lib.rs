@@ -14,11 +14,90 @@ mod selectable;
 mod text_field;
 pub(crate) mod to_quote;
 
-/// Takes in a struct.
-/// It generates a secondary struct with the same fields as one of the following types:
-/// text_field -> form_fields::FormField<form_fields::elements::TextField>,
-/// number_field -> form_fields::FormFields<form_fields::elements::NumberField<Number>>.
-/// checkbox -> form_fields::FormField<form_fields::elements::Checkbox>,
+/// Derive macro for generating form field specifications from a struct.
+/// 
+/// This macro generates a secondary struct with the same fields as the original struct, 
+/// but each field is wrapped in a `form_fields::FormField` type. The generated struct 
+/// provides functionality for rendering, parsing, validating, and loading form data.
+/// 
+/// ### Supported Attributes
+/// The macro supports the following attributes, which correspond to specific HTML input types:
+/// 
+/// #### `#[text_field]`
+/// - **Description**: Represents a text input field.
+/// - **HTML Input Type**: [`<input type="text">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/text)
+/// - **Parameters**:
+///   - `display_name`: A string to display as the label for the field.
+///   - `max_length`: Maximum number of characters allowed in the input.
+///   - `min_length`: Minimum number of characters required in the input.
+///   - `placeholder`: Placeholder text displayed inside the input field.
+/// 
+/// #### `#[number_field]`
+/// - **Description**: Represents a number input field.
+/// - **HTML Input Type**: [`<input type="number">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/number)
+/// - **Parameters**:
+///   - `display_name`: A string to display as the label for the field.
+///   - `min`: Minimum value allowed for the input.
+///   - `max`: Maximum value allowed for the input.
+/// 
+/// #### `#[date_select]`
+/// - **Description**: Represents a date picker input field.
+/// - **HTML Input Type**: [`<input type="date">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/date)
+/// - **Parameters**:
+///   - `display_name`: A string to display as the label for the field.
+///   - `min`: Minimum date allowed (formatted as `YYYY-MM-DD`).
+///   - `max`: Maximum date allowed (formatted as `YYYY-MM-DD`).
+/// 
+/// #### `#[checkbox]`
+/// - **Description**: Represents a checkbox input field.
+/// - **HTML Input Type**: [`<input type="checkbox">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/checkbox)
+/// - **Parameters**:
+///   - `display_name`: A string to display as the label for the field.
+///   - `checked`: Whether the checkbox is pre-checked.
+///   - `required_true`: Whether the checkbox must be checked to pass validation.
+///   - `help_text`: Additional text to display as help for the field.
+/// 
+/// #### `#[radio_button]`
+/// - **Description**: Represents a radio button input field.
+/// - **HTML Input Type**: [`<input type="radio">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/radio)
+/// - **Parameters**:
+///   - `display_name`: A string to display as the label for the field.
+///   - `options`: A list of selectable options.
+///   - `default_value`: The default selected option.
+/// 
+/// #### `#[select]`
+/// - **Description**: Represents a dropdown select input field.
+/// - **HTML Input Type**: [`<select>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select)
+/// - **Parameters**:
+///   - `display_name`: A string to display as the label for the field.
+///   - `options`: A list of selectable options.
+///   - `default_value`: The default selected option.
+///   - `placeholder`: Placeholder text displayed when no option is selected.
+/// 
+/// #### `#[multiselect]`
+/// - **Description**: Represents a multi-select input field.
+/// - **HTML Input Type**: [`<select multiple>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select#attr-multiple)
+/// - **Parameters**:
+///   - `display_name`: A string to display as the label for the field.
+///   - `options`: A list of selectable options.
+/// 
+/// ### Example Usage
+/// ```rust
+/// #[derive(Debug, FromForm)]
+/// struct Test {
+///     #[text_field(display_name = "Required Text", max_length = 50)]
+///     pub text: String,
+/// 
+///     #[number_field(display_name = "Age", min = 0, max = 120)]
+///     pub age: u8,
+/// 
+///     #[checkbox(display_name = "Accept Terms", required_true)]
+///     pub accept_terms: bool,
+/// }
+/// ```
+/// 
+/// This will generate a `TestFormSpec` struct with fields wrapped in `form_fields::FormField`.
+/// The generated struct can be used for rendering, parsing, and validating form data.
 #[proc_macro_derive(
     FromForm,
     attributes(

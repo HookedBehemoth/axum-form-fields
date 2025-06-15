@@ -9,12 +9,15 @@ repository.workspace = true
 readme.workspace = true
 
 [features]
-default = ["urlencoded", "chrono"]
+default = ["urlencoded", "chrono", "derive"]
 urlencoded = ["form_urlencoded"]
 multipart = ["multer"]
 chrono = ["dep:chrono"]
+derive = ["dep:form_fields_macro"]
 
 [dependencies]
+form_fields_macro = { workspace = true, optional = true }
+
 chrono = { workspace = true, optional = true }
 maud.workspace = true
 axum.workspace = true
@@ -25,4 +28,3 @@ log.workspace = true
 [dev-dependencies]
 serde.workspace = true
 tokio.workspace = true
-form_fields_macro = { path = "../form_fields_macro" }

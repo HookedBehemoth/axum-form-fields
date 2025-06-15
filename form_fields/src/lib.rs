@@ -1,11 +1,11 @@
 pub mod elements;
 pub mod from_form;
-pub mod selectable;
-pub mod validation_value;
 #[cfg(feature = "multipart")]
 pub mod multipart;
+pub mod selectable;
 #[cfg(feature = "urlencoded")]
 pub mod urlencoded;
+pub mod validation_value;
 
 /// A trait that describes a form field input element.
 /// Stores and validates data posted from a form.
@@ -73,3 +73,9 @@ impl<T: Descriptor> FormField<T> {
         }
     }
 }
+
+#[cfg(feature = "derive")]
+extern crate form_fields_macro;
+
+#[cfg(feature = "derive")]
+pub use form_fields_macro::{FromForm, Selectable};

@@ -31,7 +31,7 @@ async fn validation(method: Method, FromForm(mut form): FromForm<Test>) -> Respo
         if let Some(inner) = form.inner() {
             println!("Form data: {:?}", inner);
             if inner.text != "valid" {
-                form.text.error = Some("Text must be 'valid'".to_string());
+                form.text.set_error("Text must be 'valid'".to_string());
             } else {
                 // Here you would typically save the data to a database or perform some action
                 return Redirect::to("/").into_response();

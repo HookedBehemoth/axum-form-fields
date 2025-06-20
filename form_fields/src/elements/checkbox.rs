@@ -3,22 +3,21 @@ use crate::{Descriptor, FormField};
 /// Represents a checkbox input [`<input type="checkbox">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/checkbox).
 #[derive(Debug)]
 pub struct Checkbox {
-    pub value: Option<bool>,
     pub required_true: bool,
     pub checked: bool,
 }
 
 impl Descriptor for Checkbox {
     type Value = bool;
+    type Intermediate = Option<bool>;
 
     // NOTE: required for input type checkbox means that it has to be true. This isn't desireable.
     fn render(field: &FormField<Self>) -> maud::Markup {
         let Self {
-            value,
             required_true,
             checked,
         } = &field.descriptor;
-        let prechecked = value.unwrap_or(*checked);
+        let prechecked = field.intermediate.unwrap_or(*checked);
         maud::html! {
             label {
                 input
@@ -32,33 +31,68 @@ impl Descriptor for Checkbox {
         }
     }
 
-    fn parse(&mut self, value: &str) {
+    fn parse(&self, value: &str, intermediate: &mut Self::Intermediate) {
         if value.is_empty() {
-            self.value = None;
+            *intermediate = None;
             return;
         }
 
-        if value == "true" {
-            self.value = Some(true);
+        *intermediate = if value == "true" {
+            Some(true)
         } else {
-            self.value = Some(false);
+            Some(false)
         }
     }
 
-    fn has_value(&self) -> bool {
-        self.value.is_some() || self.checked
-    }
-
-    fn value(&self) -> Result<Self::Value, &'static str> {
-        let value = self.value.unwrap_or(false);
-        if !value && self.required_true {
-            Err("Checkbox is required")
-        } else {
-            Ok(value)
+    fn validate(&self, intermediate: &Self::Intermediate) -> Result<Self::Value, &'static str> {
+        match intermediate {
+            Some(true) => Ok(true),
+            Some(false) if !self.required_true => Ok(false),
+            None if !self.required_true => Ok(false),
+            _ => Err("Checkbox is required"),
         }
     }
 
-    fn load(&mut self, value: Self::Value) {
-        self.value = Some(value);
+    fn load(&self, value: Self::Value) -> Self::Intermediate {
+        Some(value)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn parse() {
+        let checkbox = Checkbox {
+            required_true: true,
+            checked: false,
+        };
+        let mut intermediate = None;
+        checkbox.parse("false", &mut intermediate);
+        assert_eq!(intermediate, Some(false));
+        checkbox.parse("true", &mut intermediate);
+        assert_eq!(intermediate, Some(true));
+        checkbox.parse("", &mut intermediate);
+        assert_eq!(intermediate, None);
+    }
+
+    #[test]
+    fn validate() {
+        let checkbox = Checkbox {
+            required_true: true,
+            checked: false,
+        };
+        assert_eq!(checkbox.validate(&Some(true)), Ok(true));
+        assert_eq!(checkbox.validate(&Some(false)), Err("Checkbox is required"));
+        assert_eq!(checkbox.validate(&None), Err("Checkbox is required"));
+
+        let checkbox = Checkbox {
+            required_true: false,
+            checked: false,
+        };
+        assert_eq!(checkbox.validate(&Some(true)), Ok(true));
+        assert_eq!(checkbox.validate(&Some(false)), Ok(false));
+        assert_eq!(checkbox.validate(&None), Ok(false));
     }
 }

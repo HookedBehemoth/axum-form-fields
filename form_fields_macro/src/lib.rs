@@ -89,6 +89,8 @@ pub(crate) mod to_quote;
 ///
 /// ### Example Usage
 /// ```rust
+/// use form_fields_macro::FromForm;
+/// 
 /// #[derive(Debug, FromForm)]
 /// struct Test {
 ///     #[text_field(display_name = "Required Text", max_length = 50)]
@@ -189,7 +191,7 @@ fn generate_from_request(
             fn parse_field(&mut self, name: &str, value: &str) -> bool {
                 #(
                     if name == stringify!(#idents) {
-                        form_fields::Descriptor::parse(&mut self.#idents.descriptor, value);
+                        form_fields::Descriptor::parse(&self.#idents.descriptor, value, &mut self.#idents.intermediate);
                         true
                     } else
                 )*
@@ -240,6 +242,7 @@ fn generate_impl(newtype: &Ident, origin: &Ident, fields: &[FieldParseResult]) -
                         display_name: #display_names,
                         field_name: #field_names,
                         descriptor: #initializers,
+                        intermediate: std::default::Default::default(),
                         required: #required,
                         error: None,
                         help_text: #help_text,
@@ -253,22 +256,22 @@ fn generate_impl(newtype: &Ident, origin: &Ident, fields: &[FieldParseResult]) -
 
             fn inner(&mut self) -> Option<#origin> {
                 #(
-                    let #required_fields = match form_fields::Descriptor::value(&self.#required_fields.descriptor) {
+                    let #required_fields = match form_fields::Descriptor::validate(&self.#required_fields.descriptor, &self.#required_fields.intermediate) {
                         Ok(value) => Some(value),
                         Err(err) => {
-                            self.#required_fields.error = Some(err.to_string());
+                            self.#required_fields.set_error(err.to_string());
                             None
                         }
                     };
                 )*
                 #(
-                    let #other_fields = if !form_fields::Descriptor::has_value(&self.#other_fields.descriptor) {
+                    let #other_fields = if form_fields::Intermediate::has_value(&self.#other_fields.intermediate) {
                         None
                     } else {
-                        match form_fields::Descriptor::value(&self.#other_fields.descriptor) {
+                        match form_fields::Descriptor::validate(&self.#other_fields.descriptor, &self.#other_fields.intermediate) {
                             Ok(value) => Some(value),
                             Err(err) => {
-                                self.#other_fields.error = Some(err.to_string());
+                                self.#other_fields.set_error(err.to_string());
                                 None
                             }
                         }
@@ -300,11 +303,13 @@ fn generate_impl(newtype: &Ident, origin: &Ident, fields: &[FieldParseResult]) -
 
             fn load(&mut self, input: #origin) {
                 #(
-                    form_fields::Descriptor::load(&mut self.#required_fields.descriptor, input.#required_fields);
+                    self.#required_fields.intermediate =
+                        form_fields::Descriptor::load(&self.#required_fields.descriptor, input.#required_fields);
                 )*
                 #(
                     if let Some(value) = input.#other_fields {
-                        form_fields::Descriptor::load(&mut self.#other_fields.descriptor, value);
+                        self.#other_fields.intermediate =
+                            form_fields::Descriptor::load(&self.#other_fields.descriptor, value);
                     }
                 )*
             }

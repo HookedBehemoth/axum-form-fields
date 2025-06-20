@@ -44,7 +44,6 @@ pub(crate) fn try_parse(
             },
             initializer: quote::quote! {
                 form_fields::elements::MultiSelect::<#field_type> {
-                    keys: vec![],
                     options: vec![ #( #options ),* ],
                 }
             },

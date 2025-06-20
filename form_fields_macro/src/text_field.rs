@@ -33,7 +33,6 @@ pub(crate) fn try_parse(
             },
             initializer: quote::quote! {
                 form_fields::elements::TextField {
-                    value: None,
                     min_length: #min_length,
                     max_length: #max_length,
                     placeholder: #placeholder,

@@ -9,7 +9,7 @@ repository.workspace = true
 readme.workspace = true
 
 [features]
-default = ["urlencoded", "chrono", "derive"]
+default = ["urlencoded", "chrono", "derive", "multipart"]
 urlencoded = ["form_urlencoded"]
 multipart = ["multer"]
 chrono = ["dep:chrono"]

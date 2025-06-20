@@ -1,19 +1,20 @@
 use std::{fmt::Debug, str::FromStr};
 
-use crate::{Descriptor, FormField, selectable::Selectable};
+use crate::{selectable::Selectable, Descriptor, FormField};
 
 /// Represents a multi-select input [`<input type="checkbox">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/checkbox).
 #[derive(Debug)]
 pub struct MultiSelect<T: Selectable + Debug> {
-    pub keys: Vec<T::Key>,
     pub options: Vec<T>,
 }
 
 impl<T: Selectable + Debug> Descriptor for MultiSelect<T> {
     type Value = Vec<T>;
+    type Intermediate = Vec<T::Key>;
 
     fn render(field: &FormField<Self>) -> maud::Markup {
-        let Self { keys, options } = &field.descriptor;
+        let Self { options } = &field.descriptor;
+        let keys = &field.intermediate;
         maud::html! {
             fieldset {
                 legend { (field.display_name) }
@@ -34,7 +35,7 @@ impl<T: Selectable + Debug> Descriptor for MultiSelect<T> {
         }
     }
 
-    fn parse(&mut self, value: &str) {
+    fn parse(&self, value: &str, intermediate: &mut Self::Intermediate) {
         if value.is_empty() {
             return;
         }
@@ -44,26 +45,72 @@ impl<T: Selectable + Debug> Descriptor for MultiSelect<T> {
             return;
         };
 
-        self.keys.push(key);
+        intermediate.push(key);
     }
 
-    fn has_value(&self) -> bool {
-        !self.keys.is_empty()
-    }
-
-    fn value(&self) -> Result<Self::Value, &'static str> {
-        let keys = &self.keys;
-
+    fn validate(&self, keys: &Self::Intermediate) -> Result<Self::Value, &'_ str> {
         let options = &self.options;
 
+        // Check if all keys are valid
+        for key in keys {
+            if !options.iter().any(|option| &option.key() == key) {
+                return Err("Invalid option selected");
+            }
+        }
+
+        // Return the selected options
         Ok(options
             .iter()
-            .filter(|&kv| keys.contains(&kv.key()))
+            .filter(|&option| keys.contains(&option.key()))
             .cloned()
             .collect())
     }
 
-    fn load(&mut self, value: Self::Value) {
-        self.keys = value.iter().map(|v| v.key()).collect();
+    fn load(&self, value: Self::Value) -> Self::Intermediate {
+        value.iter().map(|v| v.key()).collect()
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn parse() {
+        let multiselect = MultiSelect::<String> {
+            options: vec![],
+        };
+        let mut intermediate = vec![];
+        multiselect.parse("option1", &mut intermediate);
+        assert_eq!(intermediate, vec!["option1"]);
+        multiselect.parse("", &mut intermediate);
+        assert_eq!(intermediate, vec!["option1"]);
+        multiselect.parse("option2", &mut intermediate);
+        assert_eq!(intermediate, vec!["option1", "option2"]);
+    }
+
+    #[test]
+    fn validate() {
+        let options = vec!["option1".to_string(), "option2".to_string()];
+        let multiselect = MultiSelect { options };
+
+        // Valid selection
+        let keys = vec!["option1".to_string(), "option2".to_string()];
+        assert_eq!(
+            multiselect.validate(&keys),
+            Ok(vec!["option1".to_string(), "option2".to_string()])
+        );
+
+        // Invalid selection
+        let keys = vec!["option3".to_string()];
+        assert_eq!(multiselect.validate(&keys), Err("Invalid option selected"));
+
+        // Partial correct selection
+        let keys = vec!["option1".to_string(), "option3".to_string()];
+        assert_eq!(multiselect.validate(&keys), Err("Invalid option selected"));
+
+        // Empty selection
+        let keys: Vec<String> = vec![];
+        assert_eq!(multiselect.validate(&keys), Ok(vec![]));
     }
 }

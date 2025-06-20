@@ -32,7 +32,6 @@ pub(crate) fn try_parse(
             },
             initializer: quote::quote! {
                 form_fields::elements::Select::<#field_type> {
-                    key: None,
                     options: vec![ #( #options ),* ],
                     placeholder: #placeholder.to_string(),
                     default_value: #default_value,

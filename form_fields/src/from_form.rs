@@ -54,14 +54,15 @@ async fn parse_request_body<Form: FormSpec>(
         .to_string();
 
     log::debug!("content_type: {}", content_type);
+    let body = req.into_body();
     match &content_type {
         #[cfg(feature = "urlencoded")]
         content_type if content_type == "application/x-www-form-urlencoded" => {
-            crate::urlencoded::parse_form_urlencoded(form, req).await
+            crate::urlencoded::parse_form_urlencoded(form, body).await
         }
         #[cfg(feature = "multipart")]
         content_type if content_type.starts_with("multipart/form-data") => {
-            crate::multipart::parse_multipart(form, req, content_type).await
+            crate::multipart::parse_multipart(form, body, content_type).await
         }
         _ => {
             // Handle other content types if necessary

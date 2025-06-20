@@ -1,9 +1,10 @@
 /// A sum type to allow restoring a value for form fields where the validation
 /// failed to provide a more user-friendly error flow.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub enum Value<T> {
     Success(T),
     Failure(String, String),
+    #[default]
     None,
 }
 

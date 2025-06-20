@@ -30,7 +30,6 @@ pub(crate) fn try_parse(
             },
             initializer: quote::quote! {
                 form_fields::elements::RadioButton::<#field_type> {
-                    key: None,
                     options: vec![ #( #options ),* ],
                     default_value: #default_value,
                 }

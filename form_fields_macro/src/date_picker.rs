@@ -43,7 +43,6 @@ pub(crate) fn try_parse(
             },
             initializer: quote::quote! {
                 form_fields::elements::DatePicker {
-                    value: form_fields::validation_value::Value::None,
                     min: #min,
                     max: #max,
                 }

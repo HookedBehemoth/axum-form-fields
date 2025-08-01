@@ -93,4 +93,32 @@ mod test {
 
         assert!(form.inner().is_none());
     }
+
+    #[derive(FromForm)]
+    struct Mockptional {
+        #[text_field(display_name = "Field 1")]
+        field1: Option<String>,
+        #[text_field(display_name = "Field 2")]
+        field2: Option<String>,
+        #[text_field(display_name = "Field 3")]
+        field3: Option<String>,
+    }
+
+    #[tokio::test]
+    async fn parse_optional_fields() {
+        let body_string = "field1=value1&field2=";
+        let body = Body::from(body_string);
+        let mut form = MockptionalFormSpec::generate_spec();
+
+        assert!(parse_form_urlencoded(&mut form, body).await.is_some());
+        assert_eq!(form.field1.intermediate, Some("value1".to_string()));
+        assert_eq!(form.field2.intermediate, None);
+        assert_eq!(form.field3.intermediate, None);
+
+        let inner = form.inner().unwrap();
+        assert_eq!(inner.field1, Some("value1".to_string()));
+        assert_eq!(inner.field2, None);
+        assert_eq!(inner.field3, None);
+    }
+
 }

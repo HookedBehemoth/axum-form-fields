@@ -266,8 +266,6 @@ fn generate_impl(newtype: &Ident, origin: &Ident, fields: &[FieldParseResult]) -
                 )*
                 #(
                     let #other_fields = if form_fields::Intermediate::has_value(&self.#other_fields.intermediate) {
-                        None
-                    } else {
                         match form_fields::Descriptor::validate(&self.#other_fields.descriptor, &self.#other_fields.intermediate) {
                             Ok(value) => Some(value),
                             Err(err) => {
@@ -275,6 +273,8 @@ fn generate_impl(newtype: &Ident, origin: &Ident, fields: &[FieldParseResult]) -
                                 None
                             }
                         }
+                    } else {
+                        None
                     };
                 )*
 

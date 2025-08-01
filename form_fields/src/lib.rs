@@ -72,7 +72,7 @@ pub struct FormField<T: Descriptor> {
 impl<T: Descriptor> maud::Render for FormField<T> {
     fn render(&self) -> maud::Markup {
         maud::html! {
-            div {
+            div class="form-group" {
                 (T::render(&self))
                 @if let Some(help) = &self.help_text {
                     div class="help-text" { (help) }

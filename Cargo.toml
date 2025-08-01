@@ -3,7 +3,7 @@ resolver = "2"
 members = ["form_fields", "form_fields_macro"]
 
 [workspace.package]
-version = "0.1.4"
+version = "0.1.5"
 edition = "2024"
 license-file = "LICENSE"
 keywords = ["web", "html", "form", "axum", "maud"]

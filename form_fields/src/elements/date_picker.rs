@@ -47,16 +47,16 @@ impl Descriptor for DatePicker {
     fn validate(&self, intermediate: &Self::Intermediate) -> Result<Self::Value, &'_ str> {
         let value = intermediate.inner().ok_or("Value is required")?;
 
-        if let Some(min) = &self.min {
-            if value < min {
-                return Err("Value is less than min");
-            }
+        if let Some(min) = &self.min
+            && value < min
+        {
+            return Err("Value is less than min");
         }
 
-        if let Some(max) = &self.max {
-            if value > max {
-                return Err("Value exceeds max");
-            }
+        if let Some(max) = &self.max
+            && value > max
+        {
+            return Err("Value exceeds max");
         }
 
         Ok(*value)

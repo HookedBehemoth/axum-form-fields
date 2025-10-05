@@ -37,16 +37,16 @@ impl Descriptor for PasswordField {
     fn validate(&self, intermediate: &Self::Intermediate) -> Result<Self::Value, &'_ str> {
         let value = intermediate.as_ref().ok_or("Value is required")?;
 
-        if let Some(min_length) = self.min_length {
-            if value.len() < min_length {
-                return Err("Value is shorter than min length");
-            }
+        if let Some(min_length) = self.min_length
+            && value.len() < min_length
+        {
+            return Err("Value is shorter than min length");
         }
 
-        if let Some(max_length) = self.max_length {
-            if value.len() > max_length {
-                return Err("Value exceeds max length");
-            }
+        if let Some(max_length) = self.max_length
+            && value.len() > max_length
+        {
+            return Err("Value exceeds max length");
         }
 
         Ok(value.clone())

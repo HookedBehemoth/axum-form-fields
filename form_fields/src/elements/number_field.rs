@@ -46,16 +46,16 @@ impl<T: PartialOrd + maud::Render + Display + Copy + FromStr> Descriptor for Num
     fn validate(&self, intermediate: &Self::Intermediate) -> Result<Self::Value, &'_ str> {
         let value = intermediate.inner().ok_or("Value is required")?;
 
-        if let Some(min) = self.min {
-            if *value < min {
-                return Err("Value is less than min");
-            }
+        if let Some(min) = self.min
+            && *value < min
+        {
+            return Err("Value is less than min");
         }
 
-        if let Some(max) = self.max {
-            if *value > max {
-                return Err("Value exceeds max");
-            }
+        if let Some(max) = self.max
+            && *value > max
+        {
+            return Err("Value exceeds max");
         }
 
         Ok(*value)
@@ -98,8 +98,17 @@ mod test {
         assert_eq!(number_field.validate(&Value::Success(10)), Ok(10));
         assert_eq!(number_field.validate(&Value::Success(50)), Ok(50));
         assert_eq!(number_field.validate(&Value::Success(100)), Ok(100));
-        assert_eq!(number_field.validate(&Value::Success(5)), Err("Value is less than min"));
-        assert_eq!(number_field.validate(&Value::Success(150)), Err("Value exceeds max"));
-        assert_eq!(number_field.validate(&Value::None), Err("Value is required"));
+        assert_eq!(
+            number_field.validate(&Value::Success(5)),
+            Err("Value is less than min")
+        );
+        assert_eq!(
+            number_field.validate(&Value::Success(150)),
+            Err("Value exceeds max")
+        );
+        assert_eq!(
+            number_field.validate(&Value::None),
+            Err("Value is required")
+        );
     }
 }

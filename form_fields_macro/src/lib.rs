@@ -8,6 +8,7 @@ mod checkbox;
 mod date_picker;
 mod multiselect;
 mod number_field;
+mod password_field;
 mod radio_button;
 mod select;
 mod selectable;
@@ -115,7 +116,8 @@ pub(crate) mod to_quote;
         checkbox,
         radio_button,
         select,
-        multiselect
+        multiselect,
+        password_field,
     )
 )]
 pub fn from_form(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
@@ -373,6 +375,10 @@ fn parse_field(field: &mut Field) -> deluxe::Result<FieldParseResult> {
 
     if let Some(text_field) = text_field::try_parse(field, &ident, &field_type, required)? {
         return Ok(text_field);
+    }
+
+    if let Some(password_field) = password_field::try_parse(field, &ident, &field_type, required)? {
+        return Ok(password_field);
     }
 
     if let Some(date_picker) = date_picker::try_parse(field, &ident, &field_type, required)? {

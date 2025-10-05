@@ -32,6 +32,8 @@ async fn simple(method: Method, FromForm(mut form): FromForm<Test>) -> Response<
         if let Some(inner) = form.inner() {
             println!("{:?}", inner.text);
             println!("{:?}", inner.text_optional);
+            println!("{:?}", inner.password);
+            println!("{:?}", inner.password_optional);
             println!("{:?}", inner.number);
             println!("{:?}", inner.number_optional);
             println!("{:?}", inner.date);
@@ -54,6 +56,8 @@ async fn simple(method: Method, FromForm(mut form): FromForm<Test>) -> Response<
         form method="POST" {
             (form.text)
             (form.text_optional)
+            (form.password)
+            (form.password_optional)
             (form.number)
             (form.number_optional)
             (form.date)
@@ -78,6 +82,12 @@ struct Test {
 
     #[text_field(display_name = "Optional Text", max_length = 50)]
     pub text_optional: Option<String>,
+
+    #[password_field(display_name = "Required Password", max_length = 50)]
+    pub password: String,
+
+    #[password_field(display_name = "Optional Password", max_length = 50)]
+    pub password_optional: Option<String>,
 
     #[number_field(display_name = "Required Number (0-120)", min = 0, max = 120)]
     pub number: u8,

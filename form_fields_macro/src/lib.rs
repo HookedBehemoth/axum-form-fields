@@ -13,6 +13,7 @@ mod radio_button;
 mod select;
 mod selectable;
 mod text_field;
+mod passthrough;
 pub(crate) mod to_quote;
 
 /// Derive macro for generating form field specifications from a struct.
@@ -118,6 +119,7 @@ pub(crate) mod to_quote;
         select,
         multiselect,
         password_field,
+        passthrough,
     )
 )]
 pub fn from_form(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
@@ -399,6 +401,10 @@ fn parse_field(field: &mut Field) -> deluxe::Result<FieldParseResult> {
 
     if let Some(multiselect) = multiselect::try_parse(field, &ident, &field_type, required)? {
         return Ok(multiselect);
+    }
+
+    if let Some(passthrough) = passthrough::try_parse(field, &ident, &field_type, required)? {
+        return Ok(passthrough);
     }
 
     Err(syn::Error::new(

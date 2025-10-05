@@ -45,11 +45,23 @@ async fn simple(method: Method, FromForm(mut form): FromForm<Test>) -> Response<
             println!("{:?}", inner.multiselect);
             println!("{:?}", inner.checkbox);
             println!("{:?}", inner.checkbox_optional);
+            println!("{:?}", inner.passthrough);
+            println!("{:?}", inner.passthrough_option);
+            println!("{:?}", inner.passthrough_vec);
+            println!("{:?}", inner.passthrough_vec_option);
             // Here you would typically save the data to a database or perform some action
             return Redirect::to("/").into_response();
         } else {
             println!("Form validation failed");
         }
+    } else {
+        form.passthrough.intermediate = Some("Some passthrough value".to_string());
+        form.passthrough_option.intermediate = Some("Some optional passthrough value".to_string());
+        form.passthrough_vec.intermediate = vec!["Value 1".to_string(), "Value 2".to_string()];
+        form.passthrough_vec_option.intermediate = vec![
+            "Optional Value 1".to_string(),
+            "Optional Value 2".to_string(),
+        ];
     }
     html! {
         h1 { "Simple Form Example" }
@@ -69,6 +81,14 @@ async fn simple(method: Method, FromForm(mut form): FromForm<Test>) -> Response<
             (form.multiselect)
             (form.checkbox)
             (form.checkbox_optional)
+            input type="text" name=(form.passthrough.field_name) value=[form.passthrough.intermediate];
+            input type="text" name=(form.passthrough_option.field_name) value=[form.passthrough_option.intermediate];
+            @for value in &form.passthrough_vec.intermediate {
+                input type="hidden" name=(form.passthrough_vec.field_name) value=(value);
+            }
+            @for value in &form.passthrough_vec_option.intermediate {
+                input type="hidden" name=(form.passthrough_vec_option.field_name) value=(value);
+            }
             input type="submit";
         }
     }
@@ -133,6 +153,18 @@ struct Test {
         checked = false
     )]
     pub checkbox_optional: Option<bool>,
+
+    #[passthrough]
+    pub passthrough: String,
+
+    #[passthrough]
+    pub passthrough_option: Option<String>,
+
+    #[passthrough]
+    pub passthrough_vec: Vec<String>,
+
+    #[passthrough]
+    pub passthrough_vec_option: Option<Vec<String>>,
 }
 
 #[derive(Clone, Copy, PartialEq, Hash, Eq, Debug, Selectable)]
